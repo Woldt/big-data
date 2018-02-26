@@ -46,7 +46,7 @@ def get_number_of_distinct_country_names(input_file=sample_file):
 
 def get_number_of_distinct_places(input_file=sample_file):
     """Return number of distinct user names"""
-    return input_file.map(lambda x:  x.split("\t")[4]).distinct().count()
+    return input_file.map(lambda x:  x.split("\t")[PLACE_NAME]).distinct().count()
 
 get_number_of_distinct_country_names()
 sc.stop()
