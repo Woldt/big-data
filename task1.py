@@ -45,6 +45,6 @@ def get_number_of_distinct_country_names(input_file=sample_file):
     return input_file.map(lambda x:  x.split("\t")[COUNTRY_NAME]).distinct().count()
 
 
-print(get_number_of_distinct_country_names())
+get_number_of_distinct_country_names()
 sc.stop()
 
