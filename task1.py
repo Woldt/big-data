@@ -48,6 +48,12 @@ def get_number_of_distinct_places(input_file=sample_file):
     """Return number of distinct user names"""
     return input_file.map(lambda x:  x.split("\t")[PLACE_NAME]).distinct().count()
 
-get_number_of_distinct_country_names()
+def get_min_latitude(input_file=sample_file):
+    return input_file.map(lambda x:  float(x.split("\t")[LATITUDE])).min()
+
+def get_min_longitude(input_file=sample_file):
+    return input_file.map(lambda x:  float(x.split("\t")[LONGITUDE])).max()
+
+print()
 sc.stop()
 
