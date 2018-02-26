@@ -55,6 +55,16 @@ def get_number_of_languages(input_file=sample_file):
     return input_file.map(lambda x:  x.split("\t")[LANGUAGE]).distinct().count()
 
 
+def get_min_latitude(input_file=sample_file):
+    """Return the lowest latitude"""
+    return input_file.map(lambda x:  float(x.split("\t")[LATITUDE])).min()
+
+
+def get_min_longitude(input_file=sample_file):
+    """Return the lowest longitude"""
+    return input_file.map(lambda x:  float(x.split("\t")[LONGITUDE])).min()
+
+
 def get_max_latitude(input_file=sample_file):
     """Return the highest latitude"""
     return input_file.map(lambda x: float(x.split("\t")[LATITUDE])).max()
