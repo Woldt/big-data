@@ -1,6 +1,5 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
-from operator import add
 
 conf = (SparkConf()
          .setMaster("local")
