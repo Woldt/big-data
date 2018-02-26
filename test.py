@@ -1,4 +1,4 @@
-from pyspark import SparkConf, SparkContext, 
+from pyspark import SparkConf, SparkContext
 conf = (SparkConf()
          .setMaster("local")
          .setAppName("My app")

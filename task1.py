@@ -1,5 +1,6 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
+from operator import add
 
 conf = (SparkConf()
          .setMaster("local")
@@ -74,8 +75,12 @@ def get_max_longitude(input_file=sample_file):
     """Return the highest longitude"""
     return input_file.map(lambda tweet:float(tweet.split("\t")[LONGITUDE])).max()
 
+def get_average_words(input_file=sample_file):
+    """Return the average length of a tweet in terms of words"""
+    wordCounts = input_file.map(lambda tweet: tweet.split("\t")[TWEET_TEXT]).map(lambda text: len(text.split(" "))).collect()
+    return sum(wordCounts) / len(wordCounts)
 
-print()
+print(get_average_words(file))
 
 sc.stop()
 
