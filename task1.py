@@ -68,19 +68,26 @@ def get_min_longitude(input_file=sample_file):
 
 def get_max_latitude(input_file=sample_file):
     """Return the highest latitude"""
-    return input_file.map(lambda tweet:float(tweet.split("\t")[LATITUDE])).max()
+    return input_file.map(lambda tweet: float(tweet.split("\t")[LATITUDE])).max()
 
 
 def get_max_longitude(input_file=sample_file):
     """Return the highest longitude"""
-    return input_file.map(lambda tweet:float(tweet.split("\t")[LONGITUDE])).max()
+    return input_file.map(lambda tweet: float(tweet.split("\t")[LONGITUDE])).max()
+
+
+def get_average_characters(input_file=sample_file):
+    """Return the average number of characters in tweets"""
+    tweet_lengths = input_file.map(lambda tweet: len(tweet.split("\t")[TWEET_TEXT])).collect()
+    return sum(tweet_lengths) / len(tweet_lengths)
+
 
 def get_average_words(input_file=sample_file):
     """Return the average length of a tweet in terms of words"""
     wordCounts = input_file.map(lambda tweet: tweet.split("\t")[TWEET_TEXT]).map(lambda text: len(text.split(" "))).collect()
     return sum(wordCounts) / len(wordCounts)
 
-print(get_average_words(file))
+print()
 
 sc.stop()
 
