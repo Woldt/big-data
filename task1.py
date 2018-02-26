@@ -41,13 +41,31 @@ def get_number_of_distinct_usernames(input_file=sample_file):
 
 
 def get_number_of_distinct_country_names(input_file=sample_file):
-    """Return number of distinct user names"""
+    """Return number of distinct country names"""
     return input_file.map(lambda x:  x.split("\t")[COUNTRY_NAME]).distinct().count()
 
+
 def get_number_of_distinct_places(input_file=sample_file):
-    """Return number of distinct user names"""
+    """Return number of distinct places """
     return input_file.map(lambda x:  x.split("\t")[PLACE_NAME]).distinct().count()
 
-get_number_of_distinct_country_names()
+
+def get_number_of_languages(input_file=sample_file):
+    """Return number of languages"""
+    return input_file.map(lambda x:  x.split("\t")[LANGUAGE]).distinct().count()
+
+
+def get_max_latitude(input_file=sample_file):
+    """Return the highest latitude"""
+    return input_file.map(lambda x: float(x.split("\t")[LATITUDE])).max()
+
+
+def get_max_longitude(input_file=sample_file):
+    """Return the highest longitude"""
+    return input_file.map(lambda x: float(x.split("\t")[LONGITUDE])).max()
+
+
+print()
+
 sc.stop()
 
