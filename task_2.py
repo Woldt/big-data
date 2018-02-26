@@ -1,5 +1,6 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
+from operator import add
 
 conf = (SparkConf()
          .setMaster("local")
@@ -28,11 +29,19 @@ LATITUDE = 11
 LONGITUDE = 12
 
 
+def total_tweets_from_country(input_file=sample_file):
+    return sorted(input_file.map(lambda tweet: tweet.split("\t")[COUNTRY_NAME]).map(lambda country: (country, 1)).reduceByKey(add).collect(), key=lambda country: (-country[1], country[0]))
+
+
+
 
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_2.tsv")
 
+write_to_file(total_tweets_from_country(file)
+              )
+# print(total_tweets_from_country(file))
 
 sc.stop()
 
