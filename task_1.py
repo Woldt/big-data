@@ -30,9 +30,7 @@ LONGITUDE = 12
 
 
 def get_number_of_tweets(input_file):
-    """
-        Return number of lines in file
-    """
+    """Return number of lines in file"""
     return input_file.count()
 
 
@@ -89,6 +87,7 @@ def get_average_words(input_file=sample_file):
 
 
 def functions_task_one():
+    """Returns a list of all elements that should be written to file"""
     l = [
         get_number_of_tweets(file),
         get_number_of_distinct_usernames(file),
@@ -106,10 +105,11 @@ def functions_task_one():
 
 
 def write_to_file(collection):
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/out.tsv")
+    """Writes the collection to a .tsv file"""
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
 
 
-print()
-writeToFile(functionsTaskOne())
+write_to_file(functions_task_one())
+
 sc.stop()
 
