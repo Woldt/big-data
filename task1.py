@@ -52,7 +52,7 @@ def get_min_latitude(input_file=sample_file):
     return input_file.map(lambda x:  float(x.split("\t")[LATITUDE])).min()
 
 def get_min_longitude(input_file=sample_file):
-    return input_file.map(lambda x:  float(x.split("\t")[LONGITUDE])).max()
+    return input_file.map(lambda x:  float(x.split("\t")[LONGITUDE])).min()
 
 print()
 sc.stop()
