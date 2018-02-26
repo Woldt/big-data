@@ -87,7 +87,29 @@ def get_average_words(input_file=sample_file):
     wordCounts = input_file.map(lambda tweet: tweet.split("\t")[TWEET_TEXT]).map(lambda text: len(text.split(" "))).collect()
     return sum(wordCounts) / len(wordCounts)
 
-print()
 
+def functions_task_one():
+    l = [
+        get_number_of_tweets(file),
+        get_number_of_distinct_usernames(file),
+        get_number_of_distinct_country_names(file),
+        get_number_of_distinct_places(file),
+        get_number_of_languages(file),
+        get_min_latitude(file),
+        get_min_longitude(file),
+        get_max_latitude(file),
+        get_max_longitude(file),
+        get_average_characters(file),
+        get_average_words(file),
+    ]
+    return l
+
+
+def write_to_file(collection):
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/out.tsv")
+
+
+print()
+writeToFile(functionsTaskOne())
 sc.stop()
 
