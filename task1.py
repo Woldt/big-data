@@ -11,23 +11,21 @@ sc = SparkContext()
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
 file = sc.textFile(logFile)  # Entire file
-sample_file = file.sample(False, 0.1, 5)  # Sample file, 10% of original file
+sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 
-def count_number_of_tweets(input_file):
+def get_number_of_tweets(input_file):
     """
         Return number of lines in file
     """
-    # number_of_tweets = sample_file.count()
-    # number_of_tweets_total = file.count()
     return input_file.count()
 
 
-def distinct_usernames(input_file=sample_file):
-    username = input_file.map(lambda r: r[6]).distinct()
-    return username
+def get_number_of_distinct_usernames(input_file=sample_file):
+    """Return number of distinct user names"""
+    return input_file.map(lambda x:  x.split("\t")[6]).distinct().count()
 
 
-distinct_usernames()
+get_number_of_distinct_usernames()
 sc.stop()
 
