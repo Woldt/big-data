@@ -25,7 +25,10 @@ def get_number_of_distinct_usernames(input_file=sample_file):
     """Return number of distinct user names"""
     return input_file.map(lambda x:  x.split("\t")[6]).distinct().count()
 
+def get_number_of_distinct_places(input_file=sample_file):
+    """Return number of distinct user names"""
+    return input_file.map(lambda x:  x.split("\t")[4]).distinct().count()
 
-get_number_of_distinct_usernames()
+print(get_number_of_distinct_places())
 sc.stop()
 
