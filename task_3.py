@@ -1,6 +1,6 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
-
+from operator import add
 conf = (SparkConf()
          .setMaster("local")
          .setAppName("My app")
@@ -27,12 +27,28 @@ TWEET_TEXT = 10
 LATITUDE = 11
 LONGITUDE = 12
 
+def lat_lng_from_country(input_file=sample_file):
+    return input_file\
+        .map(lambda tweet: (tweet.split("\t")[COUNTRY_NAME], ((float(tweet.split("\t")[LATITUDE]), float(tweet.split("\t")[LONGITUDE])), 1)))\
+        .reduceByKey(lambda x, y : ((x[0][0] + y[0][0], x[0][1] + y[0][1]), x[1] + y[1]))\
+        .filter(lambda country: country[1][1] > 10)\
+        .collect()
+
+def reduce_lat_long(input_file=sample_file):
+    countries = lat_lng_from_country(input_file)
+    centroids = []
+    for country in countries:
+        string = country[0] + "\t" + str(country[1][0][0] / country[1][1]) + "\t" + str(country[1][0][1] / country[1][1])
+        centroids.append(string)
+    return centroids
+
 
 
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_3.tsv")
 
+write_to_file(reduce_lat_long())
 
 sc.stop()
 
