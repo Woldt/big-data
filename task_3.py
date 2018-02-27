@@ -27,15 +27,21 @@ TWEET_TEXT = 10
 LATITUDE = 11
 LONGITUDE = 12
 
-def lat_lng_from_country(input_file=sample_file):
+
+def geographical_centroids_per_country(input_file=sample_file):
+    """Returns a collection of centroids, containing [Country, (lat, long), number_tweets_for_current_country], for countries with more
+        than 10 tweets
+    """
     return input_file\
         .map(lambda tweet: (tweet.split("\t")[COUNTRY_NAME], ((float(tweet.split("\t")[LATITUDE]), float(tweet.split("\t")[LONGITUDE])), 1)))\
         .reduceByKey(lambda x, y : ((x[0][0] + y[0][0], x[0][1] + y[0][1]), x[1] + y[1]))\
         .filter(lambda country: country[1][1] > 10)\
         .collect()
 
-def reduce_lat_long(input_file=sample_file):
-    countries = lat_lng_from_country(input_file)
+
+def convert_to_tsv_format(input_file=sample_file):
+    """Converts the collection with  """
+    countries = geographical_centroids_per_country(input_file)
     centroids = []
     for country in countries:
         string = country[0] + "\t" + str(country[1][0][0] / country[1][1]) + "\t" + str(country[1][0][1] / country[1][1])
@@ -43,12 +49,11 @@ def reduce_lat_long(input_file=sample_file):
     return centroids
 
 
-
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
     sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_3.tsv")
 
-write_to_file(reduce_lat_long())
+write_to_file(convert_to_tsv_format(file))
 
 sc.stop()
 
