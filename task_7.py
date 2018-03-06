@@ -65,18 +65,23 @@ def find_most_frequent_words_per_city(input_file=sample_file):
         .collect()
 
 
+def convert_to_tsv_format(input_file=sample_file):
+    most_frequent_words_by_city = find_most_frequent_words_per_city(input_file)
+    elements = []
 
-        # .flatMap(lambda word: word[1]) \
-        # .map(lambda word: (word, 1)) \
-        # .reduceByKey(add) \
-        # .sortBy(lambda word: (-word[1], word[0])).take(10)
+    for city in most_frequent_words_by_city:
+        string = str(city[0])
+        for word in city[1]:
+            string += "\t" + str(word[0]) + "\t" + str(word[1])
+        elements.append(string)
+    return elements
+
 
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_7.tsv")
 
-print(find_most_frequent_words_per_city())
-
+write_to_file(convert_to_tsv_format())
 
 
 sc.stop()
