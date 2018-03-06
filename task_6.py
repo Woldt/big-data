@@ -30,21 +30,29 @@ TWEET_TEXT = 10
 LATITUDE = 11
 LONGITUDE = 12
 
-def most_frequent_words(input_file=sample_file):
+
+def find_most_frequent_words(input_file=sample_file):
     """
     : returns
     """
     stopwords = stopwordFile.map(lambda word: word).collect()
-    return input_file\
-        .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], tweet.split("\t")[TWEET_TEXT].lower()))\
-        .filter(lambda tweet: tweet[0] == "US") \
-        .map(lambda tweet: tweet[1].split(" ")) \
-        .flatMap(lambda x: x)\
-        .filter(lambda word: word not in stopwords) \
-        .map(lambda word: (word, 1))\
-        .reduceByKey(add)\
-        .collect()
-        # .sortByKey(lambda word: (-word[1], word[0]))\
+    if __name__ == '__main__':
+        return input_file\
+            .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) > 2]))\
+            .filter(lambda tweet: (tweet[0] == "US"))\
+            .flatMap(lambda word: word[1]) \
+            .map(lambda word: (word, 1)) \
+            .reduceByKey(add) \
+            .sortBy(lambda word: (-word[1], word[0])).take(10)
+
+
+def convert_to_tsv_format(input_file=sample_file):
+    most_frequent_words = find_most_frequent_words(input_file)
+    elements = []
+    for element in most_frequent_words:
+        string = str(element[0]) + "\t" + str(element[1])
+        elements.append(string)
+    return elements
 
 
 def write_to_file(collection):
@@ -52,12 +60,8 @@ def write_to_file(collection):
     sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_6.tsv")
 
 
-def mergelists():
-    rdd = sc.parallelize([[1, 2, 4, 2, 5], [1, 4, 2, 6, 1]])
-    return rdd.flatMap(lambda x: x).map((lambda y: (y, 1))).reduceByKey(add).collect()
 
+write_to_file(convert_to_tsv_format(file))
 
-write_to_file(most_frequent_words(file))
-# print(mergelists())
 sc.stop()
 
