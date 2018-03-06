@@ -28,6 +28,7 @@ TWEET_TEXT = 10
 LATITUDE = 11
 LONGITUDE = 12
 
+
 def tweets_per_city(input_file=sample_file):
     """
     : returns number of tweets per city in US sorted in descending order of tweet counts and alphabetical ordering of
@@ -47,6 +48,6 @@ def write_to_file(collection):
     """Writes the collection to a .tsv file"""
     sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_5.tsv")
 
+
 write_to_file(tweets_per_city(file))
 sc.stop()
-
