@@ -36,14 +36,20 @@ def most_frequent_words(input_file=sample_file):
     """
     stopwords = stopwordFile.map(lambda word: word).collect()
     return input_file\
-        .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], tweet.split("\t")[TWEET_TEXT]))\
+        .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], tweet.split("\t")[TWEET_TEXT].lower()))\
         .filter(lambda tweet: tweet[0] == "US") \
+        .map(lambda tweet: tweet[1].split(" ")) \
+        .flatMap(lambda x: x)\
+        .filter(lambda word: word not in stopwords) \
+        .map(lambda word: (word, 1))\
+        .reduceByKey(add)\
         .collect()
+        # .sortByKey(lambda word: (-word[1], word[0]))\
 
 
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_6.tsv")
 
 
 def mergelists():
@@ -51,7 +57,7 @@ def mergelists():
     return rdd.flatMap(lambda x: x).map((lambda y: (y, 1))).reduceByKey(add).collect()
 
 
-print(most_frequent_words())
+write_to_file(most_frequent_words(file))
 # print(mergelists())
 sc.stop()
 
