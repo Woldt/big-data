@@ -42,14 +42,21 @@ def find_most_active_hours(input_file=sample_file):
         .collect()
 
 
-for country in find_most_active_hours(file):
-    print(country)
+def convert_to_tsv_format(input_file=sample_file):
+    most_active_hours = find_most_active_hours(input_file)
+    elements = []
+    for element in most_active_hours:
+        string = element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])
+        elements.append(string)
+    return elements
 
 
 def write_to_file(collection):
     """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_1.tsv")
+    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_4.tsv")
 
+
+write_to_file(convert_to_tsv_format(file))
 
 sc.stop()
 
