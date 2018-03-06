@@ -1,5 +1,6 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
+from datetime import datetime as dt
 
 conf = (SparkConf()
          .setMaster("local")
@@ -27,6 +28,22 @@ TWEET_TEXT = 10
 LATITUDE = 11
 LONGITUDE = 12
 
+
+def find_most_active_hours(input_file=sample_file):
+    """
+    : return  most active hours
+    """
+    return input_file\
+        .map(lambda tweet: ((tweet.split("\t")[COUNTRY_NAME], dt.fromtimestamp(float(tweet.split("\t")[UTC_TIME]) / 1000 - float(tweet.split("\t")[TIMEZONE_OFFSET])).hour), 1)) \
+        .reduceByKey(lambda x, y: x+y) \
+        .map(lambda element: (element[0][0], (element[0][1], element[1]))) \
+        .reduceByKey(lambda x, y: x if x[1] > y[1] else y) \
+        .sortByKey() \
+        .collect()
+
+
+for country in find_most_active_hours(file):
+    print(country)
 
 
 def write_to_file(collection):
