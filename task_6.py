@@ -31,19 +31,20 @@ LATITUDE = 11
 LONGITUDE = 12
 
 
+
+
 def find_most_frequent_words(input_file=sample_file):
     """
     : returns
     """
     stopwords = stopwordFile.map(lambda word: word).collect()
-    if __name__ == '__main__':
-        return input_file\
-            .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) > 2]))\
-            .filter(lambda tweet: (tweet[0] == "US"))\
-            .flatMap(lambda word: word[1]) \
-            .map(lambda word: (word, 1)) \
-            .reduceByKey(add) \
-            .sortBy(lambda word: (-word[1], word[0])).take(10)
+    return input_file\
+        .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2]))\
+        .filter(lambda tweet: (tweet[0] == "US"))\
+        .flatMap(lambda word: word[1]) \
+        .map(lambda word: (word, 1)) \
+        .reduceByKey(add) \
+        .sortBy(lambda word: (-word[1], word[0])).take(10)
 
 
 def convert_to_tsv_format(input_file=sample_file):
