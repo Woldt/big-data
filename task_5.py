@@ -30,19 +30,17 @@ LONGITUDE = 12
 
 def tweets_per_city(input_file=sample_file):
     """
-    : return  most active hours
+    : returns number of tweets per city in US sorted in descending order of tweet counts and alphabetical ordering of
+    city with equal number of tweets
     """
     return input_file\
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], tweet.split("\t")[PLACE_TYPE], tweet.split("\t")[COUNTRY_CODE]))\
         .filter(lambda place: place[1] == "city" and place[2] == "US") \
         .map(lambda city: (city[0], 1))\
         .reduceByKey(add)\
-        .sortBy(lambda city: (-city[1], city[0]))\
+        .sortBy(lambda city: (-city[1], city[0])) \
+        .map(lambda city: city[0] + "\t" + str(city[1])) \
         .collect()
-
-        # .map(lambda element: (element[0][0], (element[0][1], element[1]))) \
-        # .reduceByKey(lambda x, y: x if x[1] > y[1] else y) \
-        # .sortByKey() \
 
 
 def write_to_file(collection):
