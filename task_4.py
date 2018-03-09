@@ -38,7 +38,7 @@ def find_most_active_hours(input_file=sample_file):
         .reduceByKey(lambda x, y: x+y) \
         .map(lambda element: (element[0][0], (element[0][1], element[1]))) \
         .reduceByKey(lambda x, y: x if x[1] > y[1] else y) \
-        .sortByKey().map(lambda element: element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])) \
+        .map(lambda element: element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])) \
         .coalesce(1) \
         .saveAsTextFile("data/result_4.tsv")
 

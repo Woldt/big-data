@@ -50,39 +50,36 @@ def find_most_frequent_words_per_city(input_file=sample_file):
     : returns
     """
     cities = most_frequent_cities(input_file)
+    # cities = ['Los Angeles, CA', 'Chicago, IL', 'Philadelphia, PA', 'Houston, TX', 'Manhattan, NY']
+
     stopwords = stopwordFile.map(lambda word: word).collect()
-    return input_file\
-        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2]))\
-        .filter(lambda tweet: (tweet[0] in cities))\
-        .reduceByKey(lambda x, y: x + y)\
-        .flatMapValues(lambda x: x)\
-        .map(lambda key: (key, 1))\
+    # .map(lambda x : (x[0], x[1][:10]))\
+    return input_file \
+        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2])) \
+        .filter(lambda tweet: (tweet[0] in cities)) \
+        .reduceByKey(lambda x, y: x + y) \
+        .flatMapValues(lambda x: x) \
+        .map(lambda key: (key, 1)) \
         .reduceByKey(add) \
-        .map(lambda city: (city[0][0], (city[0][1], city[1])))\
+        .map(lambda city: (city[0][0], (city[0][1], city[1]))) \
         .sortBy(lambda word: (word[0], -word[1][1], word[1][0])) \
-        .groupByKey().mapValues(list)\
-        .map(lambda x : (x[0], x[1][:10]))\
-        .collect()
+        .groupByKey().mapValues(list) \
+        .map(lambda x : x[0] \
+                        + "\t" + x[1][0][0] + "\t" + str(x[1][0][1])\
+                        + "\t" + x[1][1][0] + "\t" + str(x[1][1][1])\
+                        + "\t" + x[1][2][0] + "\t" + str(x[1][2][1])\
+                        + "\t" + x[1][3][0] + "\t" + str(x[1][3][1])\
+                        + "\t" + x[1][4][0] + "\t" + str(x[1][4][1])\
+                        + "\t" + x[1][5][0] + "\t" + str(x[1][5][1])\
+                        + "\t" + x[1][6][0] + "\t" + str(x[1][6][1])\
+                        + "\t" + x[1][7][0] + "\t" + str(x[1][7][1])\
+                        + "\t" + x[1][8][0] + "\t" + str(x[1][8][1])\
+                        + "\t" + x[1][9][0] + "\t" + str(x[1][9][1])) \
+        .coalesce(1).saveAsTextFile("data/result_7.tsv")
 
 
-def convert_to_tsv_format(input_file=sample_file):
-    most_frequent_words_by_city = find_most_frequent_words_per_city(input_file)
-    elements = []
-
-    for city in most_frequent_words_by_city:
-        string = str(city[0])
-        for word in city[1]:
-            string += "\t" + str(word[0]) + "\t" + str(word[1])
-        elements.append(string)
-    return elements
-
-
-def write_to_file(collection):
-    """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_7.tsv")
-
-write_to_file(convert_to_tsv_format())
-
+# write_to_file(convert_to_tsv_format())
+find_most_frequent_words_per_city(file)
 
 sc.stop()
 
