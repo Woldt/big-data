@@ -32,8 +32,7 @@ LONGITUDE = 12
 def total_tweets_from_country(input_file=sample_file):
     """Return total numbers of tweets per country"""
     input_file\
-        .map(lambda tweet: tweet.split("\t")[COUNTRY_NAME])\
-        .map(lambda country: (country, 1))\
+        .map(lambda country: (country.split("\t")[COUNTRY_NAME], 1))\
         .reduceByKey(add) \
         .sortBy(lambda country: (-country[1], country[0])) \
         .map(lambda city: city[0] + "\t" + str(city[1])) \
