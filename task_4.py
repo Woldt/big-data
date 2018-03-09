@@ -38,25 +38,12 @@ def find_most_active_hours(input_file=sample_file):
         .reduceByKey(lambda x, y: x+y) \
         .map(lambda element: (element[0][0], (element[0][1], element[1]))) \
         .reduceByKey(lambda x, y: x if x[1] > y[1] else y) \
-        .sortByKey() \
-        .collect()
+        .sortByKey().map(lambda element: element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])) \
+        .coalesce(1) \
+        .saveAsTextFile("data/result_4.tsv")
 
+find_most_active_hours(file)
 
-def convert_to_tsv_format(input_file=sample_file):
-    most_active_hours = find_most_active_hours(input_file)
-    elements = []
-    for element in most_active_hours:
-        string = element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])
-        elements.append(string)
-    return elements
-
-
-def write_to_file(collection):
-    """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_4.tsv")
-
-
-write_to_file(convert_to_tsv_format(file))
 
 sc.stop()
 
