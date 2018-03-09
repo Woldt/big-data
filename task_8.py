@@ -24,7 +24,23 @@ data_frame.createOrReplaceTempView("tweets")
 
 
 def get_number_of_tweets():
-    return spark.sql("SELECT * FROM tweets").count()
+    return spark.sql("SELECT COUNT(*) as NumberOfTweets FROM tweets")
+
+
+def get_distinct_usernames():
+    return spark.sql("SELECT COUNT(DISTINCT USERNAME) as DistinctUsernames FROM tweets")
+
+
+def get_distinct_country_names():
+    return spark.sql("SELECT COUNT(DISTINCT COUNTRY_NAME) as DistinctCountryNames FROM tweets")
+
+
+def get_distinct_place_names():
+    return spark.sql("SELECT COUNT(DISTINCT PLACE_NAME) as DistinctPlaceNames FROM tweets")
+
+
+def get_distinct_languages():
+    return spark.sql("SELECT COUNT(DISTINCT LANGUAGE) as DistictLanguages FROM tweets")
 
 
 def get_max_lat_long():
@@ -35,4 +51,8 @@ def get_min_lat_long():
     return spark.sql("SELECT MIN(LATITUDE) FROM tweets")
     # return spark.sql("SELECT MIN(LATITUDE), MIN(LONGITUDE) FROM tweets").collect()
 
-print(get_min_lat_long())
+
+
+get_distinct_place_names().show()
+get_distinct_languages().show()
+
