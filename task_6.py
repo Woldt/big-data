@@ -31,11 +31,10 @@ LATITUDE = 11
 LONGITUDE = 12
 
 
-
-
 def find_most_frequent_words(input_file=sample_file):
     """
-    : returns
+    : returns RDD containing the most frequent word in input_file with a count of the current word
+    speparated with a tab. Everything is written to result_6.tsv.
     """
     stopwords = stopwordFile.map(lambda word: word).collect()
     return input_file\
@@ -44,25 +43,13 @@ def find_most_frequent_words(input_file=sample_file):
         .flatMap(lambda word: word[1]) \
         .map(lambda word: (word, 1)) \
         .reduceByKey(add) \
-        .sortBy(lambda word: (-word[1], word[0])).take(10)
+        .sortBy(lambda word: (-word[1], word[0])) \
+        .zipWithIndex() \
+        .filter(lambda word: word[1] < 10) \
+        .map(lambda word: str(word[0][0]) + "\t" + str(word[0][1])) \
+        .coalesce(1).saveAsTextFile("data/result_6.tsv")
 
-
-def convert_to_tsv_format(input_file=sample_file):
-    most_frequent_words = find_most_frequent_words(input_file)
-    elements = []
-    for element in most_frequent_words:
-        string = str(element[0]) + "\t" + str(element[1])
-        elements.append(string)
-    return elements
-
-
-def write_to_file(collection):
-    """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_6.tsv")
-
-
-
-write_to_file(convert_to_tsv_format(file))
+find_most_frequent_words(file)
 
 sc.stop()
 
