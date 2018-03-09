@@ -41,13 +41,9 @@ def tweets_per_city(input_file=sample_file):
         .reduceByKey(add)\
         .sortBy(lambda city: (-city[1], city[0])) \
         .map(lambda city: city[0] + "\t" + str(city[1])) \
-        .collect()
+        .coalesce(1)\
+        .saveAsTextFile("data/result_5.tsv")
 
 
-def write_to_file(collection):
-    """Writes the collection to a .tsv file"""
-    sc.parallelize(collection).coalesce(1).saveAsTextFile("data/result_5.tsv")
-
-
-write_to_file(tweets_per_city(file))
+tweets_per_city(file)
 sc.stop()

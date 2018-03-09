@@ -46,6 +46,5 @@ def get_max_lat_long():
 
 
 def get_min_lat_long():
-    # return spark.sql("SELECT MIN(LATITUDE) FROM tweets")
     return spark.sql("SELECT MIN(LATITUDE), MIN(LONGITUDE) FROM tweets")
 
