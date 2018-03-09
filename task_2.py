@@ -31,23 +31,17 @@ LONGITUDE = 12
 
 def total_tweets_from_country(input_file=sample_file):
     """Return total numbers of tweets per country"""
-    return sorted(input_file.map(lambda tweet: tweet.split("\t")[COUNTRY_NAME]).map(lambda country: (country, 1)).reduceByKey(add).collect(), key=lambda country: (-country[1], country[0]))
+    input_file\
+        .map(lambda tweet: tweet.split("\t")[COUNTRY_NAME])\
+        .map(lambda country: (country, 1))\
+        .reduceByKey(add) \
+        .sortBy(lambda country: (-country[1], country[0])) \
+        .map(lambda city: city[0] + "\t" + str(city[1])) \
+        .coalesce(1)\
+        .saveAsTextFile("data/result_2.tsv")
 
 
-def convert(collection):
-    """Converts collection of tuples, to collection in tsv friendly format"""
-    tmp_collection = []
-    for t in collection:
-        tmp_collection.append(t[0] + "\t" + str(t[1]))
-    return tmp_collection
-
-
-def write_to_file(collection):
-    """Writes the collection to a .tsv file"""
-    sc.parallelize(convert(collection)).coalesce(1).saveAsTextFile("data/result_2.tsv")
-
-
-write_to_file(total_tweets_from_country(file))
+total_tweets_from_country(file)
 
 sc.stop()
 
