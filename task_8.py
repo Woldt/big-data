@@ -1,5 +1,6 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
+from pyspark.sql import SQLContext, SparkSession
 from operator import add
 
 conf = (SparkConf()
@@ -8,13 +9,18 @@ conf = (SparkConf()
          .set("spark.executor.memory", "1g"))
 sc = SparkContext()
 
+spark = SparkSession.builder.getOrCreate()
+
+
+
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 stopwords = "./data/stop_words.txt"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
-stopwordFile = sc.textFile(stopwords)  # Entire file
-sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
+data_frame = spark.read.option("sep", "\t").csv(logFile)
+# sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
+data_frame.show()
+
 
 UTC_TIME = 0
 COUNTRY_NAME = 1
