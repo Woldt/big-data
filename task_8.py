@@ -26,3 +26,21 @@ data_frame.createOrReplaceTempView("tweets")
 
 def get_number_of_tweets():
     return spark.sql("SELECT * FROM tweets").count()
+
+
+def get_distinct_usernames():
+    return spark.sql("SELECT USERNAME FROM tweets").distinct().count()
+
+
+def get_distinct_country_names():
+    return spark.sql("SELECT COUNTRY_NAME FROM tweets").distinct().count()
+
+
+def get_distinct_place_names():
+    return spark.sql("SELECT PLACE_NAME FROM tweets").distinct().count()
+
+
+def get_distinct_languages():
+    return spark.sql("SELECT LANGUAGE FROM tweets").distinct().count()
+
+
