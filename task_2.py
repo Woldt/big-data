@@ -30,7 +30,7 @@ LONGITUDE = 12
 
 
 def total_tweets_from_country(input_file=sample_file):
-    """Return total numbers of tweets per country"""
+    """: return total numbers of tweets per country"""
     input_file\
         .map(lambda country: (country.split("\t")[COUNTRY_NAME], 1))\
         .reduceByKey(add) \
