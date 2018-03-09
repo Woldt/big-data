@@ -14,11 +14,9 @@ spark = SparkSession.builder.getOrCreate()
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
-data_frame = spark.read.option("sep", "\t").csv(logFile).toDF('UTC_TIME', 'COUNTRY_NAME', 'COUNTRY_CODE', 'PLACE_TYPE', 'PLACE_NAME', 'LANGUAGE', 'USERNAME', 'USER_SCREEN_NAME', 'TIMEZONE_OFFSET', 'NUMBER_OF_FRIENDS', 'TWEET_TEXT', 'LATITUDE', 'LONGITUDE')
+data_frame = spark.read.option("sep", "\t").option("quote", "\n").csv(logFile).toDF('UTC_TIME', 'COUNTRY_NAME', 'COUNTRY_CODE', 'PLACE_TYPE', 'PLACE_NAME', 'LANGUAGE', 'USERNAME', 'USER_SCREEN_NAME', 'TIMEZONE_OFFSET', 'NUMBER_OF_FRIENDS', 'TWEET_TEXT', 'LATITUDE', 'LONGITUDE')
 data_frame=data_frame.withColumn("LATITUDE", data_frame["LATITUDE"].cast(FloatType()))
 data_frame=data_frame.withColumn("LONGITUDE", data_frame["LONGITUDE"].cast(FloatType()))
-# sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
-# data_frame.show()
 
 data_frame.createOrReplaceTempView("tweets")
 
@@ -44,15 +42,10 @@ def get_distinct_languages():
 
 
 def get_max_lat_long():
-    return spark.sql("SELECT MAX(LATITUDE), MAX(LONGITUDE) FROM tweets").collect()
+    return spark.sql("SELECT MAX(LATITUDE), MAX(LONGITUDE) FROM tweets")
 
 
 def get_min_lat_long():
-    return spark.sql("SELECT MIN(LATITUDE) FROM tweets")
-    # return spark.sql("SELECT MIN(LATITUDE), MIN(LONGITUDE) FROM tweets").collect()
-
-
-
-get_distinct_place_names().show()
-get_distinct_languages().show()
+    # return spark.sql("SELECT MIN(LATITUDE) FROM tweets")
+    return spark.sql("SELECT MIN(LATITUDE), MIN(LONGITUDE) FROM tweets")
 
