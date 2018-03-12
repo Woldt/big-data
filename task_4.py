@@ -11,7 +11,7 @@ sc = SparkContext()
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RDD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 UTC_TIME = 0
@@ -30,10 +30,15 @@ LONGITUDE = 12
 
 
 def find_most_active_hours(input_file=sample_file):
+    """ Create a file {result_4.tsv} containing total country, most active hour on twitter and
+        number of tweets for that hour from {input_file}
+
+    FORMAT -- {Country} {HOUR}  {Number of tweets}
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
     """
-    : return  most active hours
-    """
-    return input_file\
+    input_file\
         .map(lambda tweet: ((tweet.split("\t")[COUNTRY_NAME], dt.fromtimestamp(float(tweet.split("\t")[UTC_TIME]) / 1000 - float(tweet.split("\t")[TIMEZONE_OFFSET])).hour), 1)) \
         .reduceByKey(lambda x, y: x+y) \
         .map(lambda element: (element[0][0], (element[0][1], element[1]))) \

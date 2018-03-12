@@ -12,7 +12,7 @@ sc = SparkContext()
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 stopwords = "./data/stop_words.txt"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RDD object
 stopwordFile = sc.textFile(stopwords)  # Entire file
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
@@ -32,12 +32,16 @@ LONGITUDE = 12
 
 
 def find_most_frequent_words(input_file=sample_file):
-    """
-    : returns RDD containing the most frequent word in input_file with a count of the current word
-    speparated with a tab. Everything is written to result_6.tsv.
+    """ Creates a file {result_6.tsv} containing the most frequent word from {input_file} where
+        country equals US, with a count of the current word.
+
+        FORMAT -- {Word}{number of occurences}
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
     """
     stopwords = stopwordFile.map(lambda word: word).collect()
-    return input_file\
+    input_file\
         .map(lambda tweet: (tweet.split("\t")[COUNTRY_CODE], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2]))\
         .filter(lambda tweet: (tweet[0] == "US"))\
         .flatMap(lambda word: word[1]) \

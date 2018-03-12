@@ -11,7 +11,7 @@ sc = SparkContext()
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RRD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 UTC_TIME = 0
@@ -30,7 +30,13 @@ LONGITUDE = 12
 
 
 def total_tweets_from_country(input_file=sample_file):
-    """: return total numbers of tweets per country"""
+    """ Creates a file {result_2.tsv} containing total numbers of tweets per country from {input_file}
+
+        FORMAT -- {Country} {Number of tweets}   
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
+    """
     input_file\
         .map(lambda country: (country.split("\t")[COUNTRY_NAME], 1))\
         .reduceByKey(add) \

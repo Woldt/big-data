@@ -10,7 +10,7 @@ sc = SparkContext()
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RDD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 UTC_TIME = 0
@@ -29,10 +29,15 @@ LONGITUDE = 12
 
 
 def geographical_centroids_per_country(input_file=sample_file):
-    """Returns a collection of centroids, containing [Country, (lat, long), number_tweets_for_current_country], for countries with more
-        than 10 tweets
+    """Creates a file {result_3.tsv} containing centroids, containing Country, (lat, long), for countries with more
+        than 10 tweets from {input_file}
+    
+    FORMAT -- {Country} {Latitude}  {Longitude} 
+
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
     """
-    return input_file\
+    input_file\
         .map(lambda tweet: (tweet.split("\t")[COUNTRY_NAME], ((float(tweet.split("\t")[LATITUDE]), float(tweet.split("\t")[LONGITUDE])), 1)))\
         .reduceByKey(lambda x, y : ((x[0][0] + y[0][0], x[0][1] + y[0][1]), x[1] + y[1]))\
         .filter(lambda country: country[1][1] > 10) \

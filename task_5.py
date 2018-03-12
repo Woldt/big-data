@@ -11,7 +11,7 @@ sc = SparkContext()
 
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RDD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 UTC_TIME = 0
@@ -30,11 +30,16 @@ LONGITUDE = 12
 
 
 def tweets_per_city(input_file=sample_file):
+    """ Creates a file {result_5.tsv} containing number of tweets per city in US 
+        sorted in descending order of tweet counts and alphabetical ordering of
+        city with equal number of tweets from {input_file}
+    
+    FORMAT - {City} {Number of tweets}
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
     """
-    : returns number of tweets per city in US sorted in descending order of tweet counts and alphabetical ordering of
-    city with equal number of tweets
-    """
-    return input_file\
+    input_file\
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], tweet.split("\t")[PLACE_TYPE], tweet.split("\t")[COUNTRY_CODE]))\
         .filter(lambda place: place[1] == "city" and place[2] == "US") \
         .map(lambda city: (city[0], 1))\

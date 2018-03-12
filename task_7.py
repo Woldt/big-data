@@ -12,7 +12,7 @@ sc = SparkContext()
 logFile = "./data/geotweets.tsv"  # Should be some file on your system
 stopwords = "./data/stop_words.txt"  # Should be some file on your system
 
-file = sc.textFile(logFile)  # Entire file
+file = sc.textFile(logFile)  # Entire file as RDD object
 stopwordFile = sc.textFile(stopwords)  # Entire file
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
@@ -32,9 +32,13 @@ LONGITUDE = 12
 
 
 def most_frequent_cities(input_file=sample_file):
-    """
-    : returns number of tweets per city in US sorted in descending order of tweet counts and alphabetical ordering of
-    city with equal number of tweets
+    """ Returns five most frequent cities from the US from {input_file}
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
+    
+    Returns:
+        LIST -- returns list of five cities as strings
     """
     return input_file\
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], tweet.split("\t")[PLACE_TYPE], tweet.split("\t")[COUNTRY_CODE]))\
@@ -46,15 +50,18 @@ def most_frequent_cities(input_file=sample_file):
 
 
 def find_most_frequent_words_per_city(input_file=sample_file):
-    """
-    : returns
-    """
-    cities = most_frequent_cities(input_file)
-    # cities = ['Los Angeles, CA', 'Chicago, IL', 'Philadelphia, PA', 'Houston, TX', 'Manhattan, NY']
+    """Creates a file {result_7.tsv} containg five most frequent cities and the 10 most
+        frequent words for current city, with count for each word from {input_file}
 
+        FORMAT -. {City} {Word} {Count} {Word}  {Count} ...
+    
+    Keyword Arguments:
+         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
+    """
+
+    cities = most_frequent_cities(input_file)
     stopwords = stopwordFile.map(lambda word: word).collect()
-    # .map(lambda x : (x[0], x[1][:10]))\
-    return input_file \
+    input_file \
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2])) \
         .filter(lambda tweet: (tweet[0] in cities)) \
         .reduceByKey(lambda x, y: x + y) \
@@ -78,7 +85,6 @@ def find_most_frequent_words_per_city(input_file=sample_file):
         .coalesce(1).saveAsTextFile("data/result_7.tsv")
 
 
-# write_to_file(convert_to_tsv_format())
 find_most_frequent_words_per_city(file)
 
 sc.stop()
