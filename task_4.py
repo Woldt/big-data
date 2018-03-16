@@ -40,10 +40,10 @@ def find_most_active_hours(input_file=sample_file):
     """
     input_file\
         .map(lambda tweet: ((tweet.split("\t")[COUNTRY_NAME], dt.fromtimestamp(float(tweet.split("\t")[UTC_TIME]) / 1000 - float(tweet.split("\t")[TIMEZONE_OFFSET])).hour), 1)) \
-        .reduceByKey(lambda x, y: x+y) \
-        .map(lambda element: (element[0][0], (element[0][1], element[1]))) \
+        .reduceByKey(lambda list_x, list_y: list_x+list_y) \
+        .map(lambda country_hour: (country_hour[0][0], (country_hour[0][1], country_hour[1]))) \
         .reduceByKey(lambda x, y: x if x[1] > y[1] else y) \
-        .map(lambda element: element[0] + "\t" + str(element[1][0]) + "\t" + str(element[1][1])) \
+        .map(lambda country_hour: country_hour[0] + "\t" + str(country_hour[1][0]) + "\t" + str(country_hour[1][1])) \
         .coalesce(1) \
         .saveAsTextFile("data/result_4.tsv")
 
