@@ -39,7 +39,7 @@ def geographical_centroids_per_country(input_file=sample_file):
     """
     input_file\
         .map(lambda tweet: (tweet.split("\t")[COUNTRY_NAME], ((float(tweet.split("\t")[LATITUDE]), float(tweet.split("\t")[LONGITUDE])), 1)))\
-        .reduceByKey(lambda x, y : ((x[0][0] + y[0][0], x[0][1] + y[0][1]), x[1] + y[1]))\
+        .reduceByKey(lambda countryLatLngX, countryLatLngY: ((countryLatLngX[0][0] + countryLatLngY[0][0], countryLatLngX[0][1] + countryLatLngY[0][1]), countryLatLngX[1] + countryLatLngY[1]))\
         .filter(lambda country: country[1][1] > 10) \
         .map(lambda country: country[0] + "\t" + str(country[1][0][0] / country[1][1]) + "\t" + str(country[1][0][1] / country[1][1])) \
         .coalesce(1)\

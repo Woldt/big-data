@@ -64,8 +64,8 @@ def find_most_frequent_words_per_city(input_file=sample_file):
     input_file \
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], [word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2])) \
         .filter(lambda tweet: (tweet[0] in cities)) \
-        .reduceByKey(lambda x, y: x + y) \
-        .flatMapValues(lambda x: x) \
+        .reduceByKey(lambda wordlist_x, wordlist_y: wordlist_x + wordlist_y) \
+        .flatMapValues(lambda city_words_key: city_words_key) \
         .map(lambda key: (key, 1)) \
         .reduceByKey(add) \
         .map(lambda city: (city[0][0], (city[0][1], city[1]))) \
@@ -85,7 +85,7 @@ def find_most_frequent_words_per_city(input_file=sample_file):
         .coalesce(1).saveAsTextFile("data/result_7.tsv")
 
 
-find_most_frequent_words_per_city(file)
+find_most_frequent_words_per_city()
 
 sc.stop()
 
