@@ -13,6 +13,8 @@ logFile = "./data/geotweets.tsv"  # Should be some file on your system
 file = sc.textFile(logFile)  # Entire file as an RDD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
+
+# Static variables for easy extraction from RDD objects
 UTC_TIME = 0
 COUNTRY_NAME = 1
 COUNTRY_CODE = 2
