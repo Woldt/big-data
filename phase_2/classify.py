@@ -36,27 +36,26 @@ def total_number_of_tweets(input_file=sample_file):
 
 
 def tweets_per_city(input_file=sample_file):
-    """ Creates a file {result_5.tsv} containing number of tweets per city in US
-        sorted in descending order of tweet counts and alphabetical ordering of
-        city with equal number of tweets from {input_file}
+    return input_file \
+        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], 1)) \
+        .reduceByKey(add) \
+        .collect()
 
-    FORMAT - {City} {Number of tweets}
 
-    Keyword Arguments:
-         input_file {Spark RDD object} -- Spark rdd object based on TSV file (default: {sample_file})
-    """
+def classify(input_file=sample_file):
+    cities = dict(tweets_per_city())
+    stopwords = stopwordFile.map(lambda word: word).collect()
     input_file \
-        .map(
-        lambda tweet: (tweet.split("\t")[PLACE_NAME], tweet.split("\t")[PLACE_TYPE], tweet.split("\t")[COUNTRY_CODE], list({word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwordFile and len(word) >= 2}))) \
-        .filter(lambda place: place[1] == "city" and place[2] == "US" and place[0] == "Manhattan, NY") \
-        .map(lambda place: (place[0], place[3]))\
+        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], list({word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2}))) \
         .reduceByKey(lambda wordlist_x, wordlist_y: wordlist_x + wordlist_y) \
+        .flatMapValues(lambda city_words_key: city_words_key) \
+        .map(lambda key: (key, 1)) \
+        .reduceByKey(add) \
+        .map(lambda city: ((city[0][0], cities[city[0][0]]), (city[0][1], city[1]))) \
+        .groupByKey().mapValues(list) \
         .coalesce(1) \
-        .saveAsTextFile("data/result1.tsv")
-        # .flatMapValues(lambda city_words_key: city_words_key) \
-        # .map(lambda city: (city[0], 1)) \
-        # .reduceByKey(add) \
-        # .map(lambda city: city[0] + "\t" + str(city[1])) \
+        .saveAsTextFile("data/result4.tsv")
 
 
-tweets_per_city()
+
+classify()
