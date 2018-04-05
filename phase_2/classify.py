@@ -1,6 +1,7 @@
 import pyspark
 from pyspark import SparkConf, SparkContext
 from operator import add
+from itertools import chain
 
 conf = (SparkConf()
          .setMaster("local")
@@ -41,8 +42,21 @@ def tweets_per_city(input_file=sample_file):
         .reduceByKey(add) \
         .collect()
 
+# print(tweets_per_city())
+
+def naive_bayes(T, T_place, word_list, tweet_words):
+    word_dict = dict(word_list)
+    probability = abs(T_place)/abs(T)
+    for word in tweet_words:
+        if word in word_dict:
+            probability *= abs(word_dict[word])/abs(T_place)
+        else:
+            probability = 0
+    return probability
 
 def classify(input_file=sample_file):
+    textList = ["bejesus"]
+    total_tweets = total_number_of_tweets()
     cities = dict(tweets_per_city())
     stopwords = stopwordFile.map(lambda word: word).collect()
     input_file \
@@ -51,11 +65,18 @@ def classify(input_file=sample_file):
         .flatMapValues(lambda city_words_key: city_words_key) \
         .map(lambda key: (key, 1)) \
         .reduceByKey(add) \
-        .map(lambda city: ((city[0][0], cities[city[0][0]]), (city[0][1], city[1]))) \
+        .map(lambda place: ((place[0][0], cities[place[0][0]]), (place[0][1], place[1]))) \
         .groupByKey().mapValues(list) \
+        .map(lambda place : (naive_bayes(total_tweets, place[0][1], place[1], textList), place[0][0])) \
+        .groupByKey().mapValues(list) \
+        .sortBy(lambda place: -place[0]) \
+        .filter(lambda place: place[0] > 0) \
+        .map(lambda places : (".".join(places[1]).replace(".", "\t"), places[0])) \
+        .zipWithIndex() \
+        .filter(lambda word: word[1] < 1) \
+        .map(lambda place: place[0][0] + "\t" + str(place[0][1]))\
         .coalesce(1) \
-        .saveAsTextFile("data/result4.tsv")
-
+        .saveAsTextFile("data/result.tsv")
 
 
 classify()
