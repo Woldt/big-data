@@ -1,7 +1,11 @@
-import pyspark
 from pyspark import SparkConf, SparkContext
 from operator import add
-from itertools import chain
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-training")
+parser.add_argument("-input")
+parser.add_argument("-output")
+args = parser.parse_args()
 
 conf = (SparkConf()
          .setMaster("local")
@@ -10,7 +14,8 @@ conf = (SparkConf()
 sc = SparkContext()
 
 
-logFile = "../data/geotweets.tsv"  # Should be some file on your system
+# logFile = "../data/geotweets.tsv"  # Should be some file on your system
+logFile = args.training  # Should be some file on your system
 stopwords = "../data/stop_words.txt"  # Should be some file on your system
 
 file = sc.textFile(logFile)  # Entire file as RDD object
@@ -53,9 +58,9 @@ def naive_bayes(T, T_place, word_list, tweet_words):
             probability = 0
     return probability
 
-
-def classify(training=sample_file, input="data/input.txt", output="data/result.tsv"):
-    input = open(input, "r").read().split(" ")
+# , input="../data/input1.txt", output="data/result.tsv"
+def classify(training=sample_file):
+    input = open(args.input, "r").read().split(" ")
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
     stopwords = stopwordFile.map(lambda word: word).collect()
@@ -76,7 +81,7 @@ def classify(training=sample_file, input="data/input.txt", output="data/result.t
         .filter(lambda word: word[1] < 1) \
         .map(lambda place: place[0][0] + "\t" + str(place[0][1]))\
         .coalesce(1) \
-        .saveAsTextFile(output)
+        .saveAsTextFile(args.output)
 
 
-classify()
+classify(file)
