@@ -9,7 +9,7 @@ conf = (SparkConf()
 sc = SparkContext()
 
 
-logFile = "./data/geotweets.tsv"  # Should be some file on your system
+logFile = "../data/geotweets.tsv"  # Should be some file on your system
 
 file = sc.textFile(logFile)  # Entire file as RRD object
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file

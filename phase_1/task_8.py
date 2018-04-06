@@ -12,7 +12,7 @@ sc = SparkContext()
 
 spark = SparkSession.builder.getOrCreate()  # Create spark session
 
-logFile = "./data/geotweets.tsv"  # Should be some file on your system containing geotweets
+logFile = "../data/geotweets.tsv"  # Should be some file on your system containing geotweets
 
 # Creates data frame with tab as separation new line as quotation, with columnnames equal to columns
 # Quotation on new line is done because of the converter merges some of the "real" quatation marks, which results in merged lines

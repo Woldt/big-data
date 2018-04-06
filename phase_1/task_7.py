@@ -9,8 +9,8 @@ conf = (SparkConf()
 sc = SparkContext()
 
 
-logFile = "./data/geotweets.tsv"  # Should be some file on your system
-stopwords = "./data/stop_words.txt"  # Should be some file on your system
+logFile = "../data/geotweets.tsv"  # Should be some file on your system
+stopwords = "../data/stop_words.txt"  # Should be some file on your system
 
 file = sc.textFile(logFile)  # Entire file as RDD object
 stopwordFile = sc.textFile(stopwords)  # Entire file
