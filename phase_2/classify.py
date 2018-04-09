@@ -59,13 +59,14 @@ def naive_bayes(T, T_place, word_list, tweet_words):
     return probability
 
 # , input="../data/input1.txt", output="data/result.tsv"
+#         .filter(lambda place: place[0] > 0) \
 def classify(training=sample_file):
     stopwords = stopwordFile.map(lambda word: word).collect()
-    input = [word for word in open(args.input, "r").read().lower().split(" ") if word not in stopwords and len(word) >= 2]
+    input = open(args.input, "r").read().lower().split(" ")
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
     training \
-        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], list({word for word in tweet.split("\t")[TWEET_TEXT].lower().split(" ") if word not in stopwords and len(word) >= 2}))) \
+        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], list(tweet.split("\t")[TWEET_TEXT].lower().split(" ")))) \
         .reduceByKey(lambda wordlist_x, wordlist_y: wordlist_x + wordlist_y) \
         .flatMapValues(lambda city_words_key: city_words_key) \
         .map(lambda key: (key, 1)) \
@@ -75,7 +76,6 @@ def classify(training=sample_file):
         .map(lambda place : (naive_bayes(total_tweets, place[0][1], place[1], input), place[0][0])) \
         .groupByKey().mapValues(list) \
         .sortBy(lambda place: -place[0]) \
-        .filter(lambda place: place[0] > 0) \
         .map(lambda places: (".".join(places[1]).replace(".", "\t"), places[0])) \
         .zipWithIndex() \
         .filter(lambda word: word[1] < 1) \
