@@ -36,10 +36,28 @@ LONGITUDE = 12
 
 
 def total_number_of_tweets(input_file=sample_file):
+    """Return number of tweets in {input_file}
+    
+    Keyword Arguments:
+        input_file {RDD Object} -- TSV file in RDD object (default: {sample_file})
+    
+    Returns:
+        int -- Number of tweets
+    """
+
     return input_file.count()
 
 
 def tweets_per_city(input_file=sample_file):
+    """ Return number of tweets per city from {input_file}
+    
+    Keyword Arguments:
+        input_file {RDD Object} -- TSV file in RDD object (default: {sample_file})
+    
+    Returns:
+        list -- list with tweets per city [(city, #tweets)...(city, #tweets)]
+    """
+
     return input_file \
         .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], 1)) \
         .reduceByKey(add) \
@@ -47,6 +65,17 @@ def tweets_per_city(input_file=sample_file):
 
 
 def naive_bayes(T, T_place, word_list, tweet_words):
+    """Function computing naive bayes formula
+
+    Arguments:
+        T {int} -- number of tweets
+        T_place {int} -- number of tweets from place
+        word_list {list} -- list of tuples with (word, probability)
+        tweet_words {list} -- words in tweet
+
+    Returns:
+        float -- probability
+    """
     word_dict = dict(word_list)
     probability = abs(T_place)/abs(T)
     for word in tweet_words:
@@ -56,9 +85,16 @@ def naive_bayes(T, T_place, word_list, tweet_words):
             probability = 0
     return probability
 
-# , input="../data/input1.txt", output="data/result.tsv"
-#         .filter(lambda place: place[0] > 0) \
+
 def classify(training=sample_file):
+    """
+    Naive Bayes classifier for Location Estimation of a tweet
+    Creates a file {output.tsv} containg city probability
+    
+    Keyword Arguments:
+        training {TSV file} -- tsv file containing twitter data (default: {sample_file})
+    """
+
     input = open(args.input, "r").read().lower().split(" ")
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
