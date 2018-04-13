@@ -16,10 +16,8 @@ sc = SparkContext()
 
 # logFile = "../data/geotweets.tsv"  # Should be some file on your system
 logFile = args.training  # Should be some file on your system
-stopwords = "../data/stop_words.txt"  # Should be some file on your system
 
 file = sc.textFile(logFile)  # Entire file as RDD object
-stopwordFile = sc.textFile(stopwords)  # Entire file
 sample_file = file.sample(False, 0.01, 5)  # Sample file, 10% of original file
 
 UTC_TIME = 0
@@ -61,7 +59,6 @@ def naive_bayes(T, T_place, word_list, tweet_words):
 # , input="../data/input1.txt", output="data/result.tsv"
 #         .filter(lambda place: place[0] > 0) \
 def classify(training=sample_file):
-    stopwords = stopwordFile.map(lambda word: word).collect()
     input = open(args.input, "r").read().lower().split(" ")
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
