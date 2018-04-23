@@ -99,7 +99,7 @@ def classify(training=sample_file):
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
     training \
-        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], list(tweet.split("\t")[TWEET_TEXT].lower().split(" ")))) \
+        .map(lambda tweet: (tweet.split("\t")[PLACE_NAME], list(set(tweet.split("\t")[TWEET_TEXT].lower().split(" "))))) \
         .reduceByKey(lambda wordlist_x, wordlist_y: wordlist_x + wordlist_y) \
         .flatMapValues(lambda city_words_key: city_words_key) \
         .map(lambda key: (key, 1)) \
