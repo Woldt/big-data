@@ -95,7 +95,7 @@ def classify(training=sample_file):
         training {TSV file} -- tsv file containing twitter data (default: {sample_file})
     """
 
-    input = open(args.input, "r").read().lower().split(" ")
+    input = sc.textFile(args.input).map(lambda word: word.lower().split(" ")).collect()[0]  # Input tweet converted into list of words
     total_tweets = total_number_of_tweets(training)
     cities = dict(tweets_per_city(training))
     training \
